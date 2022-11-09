@@ -1,5 +1,6 @@
 {% load static %}
 {% load bootstrap4 %}
+{% load thumbnail %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,22 +22,21 @@
                <a class="dropdown-item" href="#">Изменить личные данные</a>
                <a class="dropdown-item" href="#">Изменить пароль</a>
                <div class="dropdown-divider"></div>
-               <a class="dropdown-item" href="#">Выйти</a>
+               <a class="dropdown-item" href="{% url 'logout' %}">Выйти</a>
                <div class="dropdown-divider"></div>
-               <a class="dropdown-item" href="#">Удалить</a>
+               <a class="dropdown-item" href="{% url 'polls:profile_delete' %}">Удалить</a>
            </div>
        </div>
-       <a class="p-2 text-dark" href="#">Регистрация</a>
-       <a class="p-2 text-dark" href="login">Вход</a>
+       <a class="p-2 text-dark" href="{% url 'polls:register' %}">Регистрация</a>
+       <a class="p-2 text-dark" href="{% url 'login' %}">Вход</a>
    </div>
    <div class="row">
 
        <nav class="col-md-auto nav flex-column">
            <a class="nav-link root" href="{% url 'polls:index'  %}">Главная</a>
            <span class="nav-link root font-weight-bold">
-               Недвижимость
+               Пользователь: {{ user.get_username }} <img src="{% thumbnail user.avatar 'default' %}">
            </span>
-           <a class="nav-link" href="#">Жилье</a>
        </nav>
 
        <div class="container">

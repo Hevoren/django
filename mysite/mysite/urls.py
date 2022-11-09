@@ -18,8 +18,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.views.decorators.cache import never_cache
-from django.views.generic import RedirectView
 from django.views.static import serve
+from django.views.generic import RedirectView
+
 
 urlpatterns = [
     path('polls/', include('polls.urls')),

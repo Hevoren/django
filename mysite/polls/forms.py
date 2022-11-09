@@ -1,8 +1,6 @@
 from django import forms
-from django.contrib.messages import debug
 from django.core.exceptions import ValidationError
-from django.forms import TextInput
-from .models import AdvUser
+from .models import User
 from .models import user_registrated
 
 
@@ -35,6 +33,5 @@ class RegisterUserForm(forms.ModelForm):
         return user
 
     class Meta:
-        model = AdvUser
-        fields = ('username', 'email', 'password1', 'password2',
-                  'name', 'surname', 'avatar')
+        model = User
+        fields = ('name', 'surname', 'username', 'avatar')

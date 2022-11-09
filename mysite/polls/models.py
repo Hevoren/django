@@ -1,10 +1,10 @@
 import datetime
-from os.path import splitext
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, FileExtensionValidator
 from django.db import models
 from django.dispatch import Signal
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 
 
 class Question(models.Model):
@@ -27,11 +27,11 @@ class Choice(models.Model):
         return self.choice_text
 
 
-def get_timestamp_path(instance, filename):
-    return '%s%s' % (datetime.now().timestamp(), splitext(filename)[1])
+def get_name_file(instance, filename):
+    return 'mysite/file'.join([get_random_string(5) + '_' + filename])
 
 
-class AdvUser(AbstractUser):
+class User(AbstractUser):
     name = models.CharField(max_length=200, verbose_name='Имя', blank=False, validators=[
         RegexValidator(
             regex='^[А-Яа-я -]*$',
@@ -53,20 +53,14 @@ class AdvUser(AbstractUser):
             code='invalid_username'
         ),
     ])
-    avatar = models.ImageField(models.ImageField(max_length=200, upload_to=get_timestamp_path, blank=False, null=True,
-                                                 validators=[FileExtensionValidator(
-                                                     allowed_extensions=['png', 'jpg', 'jpeg'])]))
+    avatar = models.ImageField(max_length=200, upload_to=get_name_file, verbose_name='Аватар', blank=False,
+                               null=True,
+                               validators=[FileExtensionValidator(
+                                   allowed_extensions=['png', 'jpg', 'jpeg'])])
     email = models.EmailField(max_length=200, verbose_name='Почта', unique=True, blank=False)
     password = models.CharField(max_length=200, verbose_name='Пароль', blank=False)
 
     USERNAME_FIELD = 'username'
-
-    def delete(self, *args, **kwargs):
-        for question in self.question_set.all():
-            question.delete()
-        for avatar in self.avatar_set.all():
-            avatar.delete()
-        super().delete(*args, **kwargs)
 
     def __str__(self):
         return str(self.name) + ' ' + str(self.surname)

@@ -3,12 +3,14 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import CreateView
-
-from .forms import RegisterUserForm
-from .models import Question, Choice, AdvUser
+from .models import Question, Choice, User
 from django.template import loader
 from django.urls import reverse, reverse_lazy
 from django.views import generic
+from .forms import RegisterUserForm
+from django.views.generic import UpdateView, CreateView, DeleteView
+from django.contrib.auth import logout
+from django.contrib import messages
 
 
 class IndexView(generic.ListView):
@@ -53,7 +55,27 @@ class StudioLogoutView(LoginRequiredMixin, LogoutView):
 
 
 class RegisterUserView(CreateView):
-    model = AdvUser
-    template_name = 'registrations/register_user.html'
+    model = User
+    template_name = 'registration/register_user.html'
     form_class = RegisterUserForm
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('polls:index')
+
+
+class DeleteUserView(LoginRequiredMixin, DeleteView):
+    model = User
+    template_name = 'registration/delete_user.html'
+    success_url = reverse_lazy('polls:index')
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user_id = request.user.pk
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        logout(request)
+        messages.add_message(request, messages.SUCCESS, 'Пользователь удален')
+        return super().post(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        if not queryset:
+            queryset = self.get_queryset()
+        return get_object_or_404(queryset, pk=self.user_id)

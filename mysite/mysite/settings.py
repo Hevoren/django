@@ -127,6 +127,8 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 LOGIN_REDIRECT_URL = '/'
 
+LOGOUT_REDIRECT_URL = '/'
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -136,7 +138,7 @@ MEDIA_URL = '/media/'
 THUMBNAIL_ALIASES = {
     '': {
         'default': {
-            'size': (96, 96),
+            'size': (40, 40),
             'crop': 'scale',
         },
     },
@@ -144,4 +146,4 @@ THUMBNAIL_ALIASES = {
 
 THUMBNAIL_BASEDIR = 'thumbnails'
 
-AUTH_USER_MODEL = 'polls.AdvUser'
+AUTH_USER_MODEL = 'polls.User'

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, Choice, AdvUser
+from .models import Question, Choice, User
 
 
 class ChoiceInLine(admin.TabularInline):
@@ -12,6 +12,6 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [ChoiceInLine]
 
 
-@admin.register(AdvUser)
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'name', 'surname', 'avatar', 'email')
