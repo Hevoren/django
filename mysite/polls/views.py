@@ -1,16 +1,20 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import CreateView
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, HttpResponse
 from .models import Question, Choice, User
-from django.template import loader
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.views import generic
 from .forms import RegisterUserForm
 from django.views.generic import UpdateView, CreateView, DeleteView
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from .forms import ChangeUserInfoForm
+from django.db import IntegrityError
 
 
 class IndexView(generic.ListView):
@@ -74,6 +78,24 @@ class DeleteUserView(LoginRequiredMixin, DeleteView):
         logout(request)
         messages.add_message(request, messages.SUCCESS, 'Пользователь удален')
         return super().post(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        if not queryset:
+            queryset = self.get_queryset()
+        return get_object_or_404(queryset, pk=self.user_id)
+
+
+class ChangeUserInfoView(SuccessMessageMixin, LoginRequiredMixin,
+                         UpdateView):
+    model = User
+    template_name = 'registration/change_user_info.html'
+    form_class = ChangeUserInfoForm
+    success_url = reverse_lazy('polls:profile')
+    success_message = 'Личные данные пользователя изменены'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user_id = request.user.pk
+        return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
         if not queryset:
