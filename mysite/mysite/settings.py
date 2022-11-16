@@ -141,6 +141,10 @@ THUMBNAIL_ALIASES = {
             'size': (40, 40),
             'crop': 'scale',
         },
+        'detail': {
+            'size': (200, 200),
+            'crop': 'scale',
+        },
     },
 }
 

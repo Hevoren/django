@@ -1,18 +1,22 @@
 {% extends "base.html" %}
 {% load bootstrap4 %}
+{% load thumbnail %}
 {% block content %}
 <form action="{% url 'polls:vote' question.id %}" method="post">
     {% csrf_token %}
     <fieldset>
         <legend>
-            <h1>{{question.question_text}}</h1>
+            <h2>{{question.question_text}}</h2>
         </legend>
+        <img src="{% thumbnail question.img 'detail' %}" alt="Картинка">
+        <p>{{question.description_choice}}</p>
         {% if error_message %}<p><strong> {{error_message}}</strong></p>{% endif %}
         {% for choice in question.choice_set.all %}
         <input type="radio" name="choice" id="choice{{forloop.counter}}" value="{{choice.id}}">
         <label for="choice{{forloop.counter}}">{{choice.choice_text}}</label><br>
         {% endfor %}
     </fieldset>
-<input type="submit" value="Vote">
+<input type="submit" value="Отправить">
 </form>
+
 {% endblock %}

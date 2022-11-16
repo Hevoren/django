@@ -1,9 +1,11 @@
+from datetime import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect, HttpResponse
-from .models import Question, Choice, User
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from .models import Question, Choice, User, Vote
 from django.urls import reverse
 from django.views import generic
 from .forms import RegisterUserForm
@@ -35,19 +37,27 @@ class ResultsView(generic.DetailView):
     template_name = 'polls/results.html'
 
 
+@login_required
 def vote(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
+    question_vote = get_object_or_404(Question, pk=question_id)
+    vote, created = Vote.objects.get_or_create(voter=request.user, question_vote=question_vote)
+    if not created:
+        return render(request, 'polls/detail.html', {
+            'question': question_vote,
+            'error_message': 'Голосовать можно только один раз'
+        })
     try:
-        selected_choice = question.choice_set.get(pk=request.POST['choice'])
+        selected_choice = question_vote.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
         return render(request, 'polls/detail.html', {
-            'question': question,
-            'error_message': 'вы не сделали выбор'
+            'question': question_vote,
+            'error_message': 'Вы не сделали выбор'
         })
+
     else:
         selected_choice.votes += 1
         selected_choice.save()
-        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+        return HttpResponseRedirect(reverse('polls:results', args=(question_vote.id,)))
 
 
 class StudioLoginView(LoginView):
@@ -101,3 +111,23 @@ class ChangeUserInfoView(SuccessMessageMixin, LoginRequiredMixin,
         if not queryset:
             queryset = self.get_queryset()
         return get_object_or_404(queryset, pk=self.user_id)
+
+
+class QuestionListView(LoginRequiredMixin, generic.ListView):
+    model = Question
+    template_name = 'polls/question_list.html'
+
+
+class QuestionCreate(CreateView):
+    model = Question
+    fields = ['question_text', 'description_question', 'description_choice', 'img']
+
+    def form_valid(self, form):
+        form.instance.voter = self.request.user
+        form.instance.pub_date = datetime.date.today()
+        return super().form_valid(form)
+
+
+class QuestionDelete(DeleteView):
+    model = Question
+    success_url = reverse_lazy('my-question')

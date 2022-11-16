@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, Choice, User
+from .models import Question, Choice, User, Vote
 
 
 class ChoiceInLine(admin.TabularInline):
@@ -15,3 +15,8 @@ class QuestionAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'name', 'surname', 'avatar', 'email')
+
+
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
+    model = Vote
