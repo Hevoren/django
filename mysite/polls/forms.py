@@ -34,4 +34,13 @@ class RegisterUserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('name', 'surname', 'username', 'avatar')
+        fields = ('name', 'surname', 'username', 'email', 'avatar')
+
+
+class ChangeUserInfoForm(forms.ModelForm):
+    email = forms.EmailField(required=True,
+                             label='Адрес электронной почты')
+
+    class Meta:
+        model = User
+        fields = ('name', 'surname', 'username', 'email', 'avatar')
