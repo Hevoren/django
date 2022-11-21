@@ -1,10 +1,10 @@
 from datetime import datetime
-
+from datetime import date
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from .models import Question, Choice, User, Vote
 from django.urls import reverse
 from django.views import generic
@@ -16,7 +16,6 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from .forms import ChangeUserInfoForm
-from django.db import IntegrityError
 
 
 class IndexView(generic.ListView):
@@ -111,23 +110,3 @@ class ChangeUserInfoView(SuccessMessageMixin, LoginRequiredMixin,
         if not queryset:
             queryset = self.get_queryset()
         return get_object_or_404(queryset, pk=self.user_id)
-
-
-class QuestionListView(LoginRequiredMixin, generic.ListView):
-    model = Question
-    template_name = 'polls/question_list.html'
-
-
-class QuestionCreate(CreateView):
-    model = Question
-    fields = ['question_text', 'description_question', 'description_choice', 'img']
-
-    def form_valid(self, form):
-        form.instance.voter = self.request.user
-        form.instance.pub_date = datetime.date.today()
-        return super().form_valid(form)
-
-
-class QuestionDelete(DeleteView):
-    model = Question
-    success_url = reverse_lazy('my-question')
